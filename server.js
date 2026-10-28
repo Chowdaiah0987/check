@@ -2,8 +2,6 @@
 require('dotenv').config();
 
 // Fix Node.js SRV DNS lookups on local Windows development.
-// Override with DNS_SERVERS in .env if required.
-// In production, use the platform's DNS unless explicitly configured.
 const dns = require('node:dns');
 
 const dnsServers = (
@@ -202,44 +200,17 @@ const wrap = handler => (req, res, next) =>
   Promise.resolve(handler(req, res, next)).catch(next);
 
 const URLF = new Set([
-  'videoUrl',
-  'github',
-  'linkedin',
-  'demoUrl',
-  'url',
-  'docsUrl',
-  'cover',
-  'pdf',
-  'photo',
-  'doc',
-  'icon',
-  'fileUrl'
+  'videoUrl', 'github', 'linkedin', 'demoUrl', 'url',
+  'docsUrl', 'cover', 'pdf', 'photo', 'doc', 'icon', 'fileUrl'
 ]);
 
 const LANGS = [
-  'python',
-  'java',
-  'c',
-  'cpp',
-  'javascript',
-  'r',
-  'sql',
-  'other'
+  'python', 'java', 'c', 'cpp', 'javascript', 'r', 'sql', 'other'
 ];
 
 const SUBF = [
-  'name',
-  'aim',
-  'description',
-  'procedure',
-  'language',
-  'code',
-  'sampleInput',
-  'expectedOutput',
-  'output',
-  'videoUrl',
-  'fileUrl',
-  'notes'
+  'name', 'aim', 'description', 'procedure', 'language', 'code',
+  'sampleInput', 'expectedOutput', 'output', 'videoUrl', 'fileUrl', 'notes'
 ];
 
 const rmFiles = (...values) =>
@@ -249,12 +220,7 @@ const rmFiles = (...values) =>
     }
   });
 
-const ML = new Set([
-  'code',
-  'expectedOutput',
-  'sampleInput',
-  'output'
-]);
+const ML = new Set(['code', 'expectedOutput', 'sampleInput', 'output']);
 
 function clean(body, allowed) {
   const result = {};
@@ -262,7 +228,6 @@ function clean(body, allowed) {
 
   for (const key of allowed) {
     if (!(key in body)) continue;
-
     let value = body[key];
 
     if (['topics', 'tags', 'skills'].includes(key)) {
@@ -272,19 +237,13 @@ function clean(body, allowed) {
         .slice(0, 50);
     } else if (key === 'number') {
       value = Number(value);
-
       if (!Number.isInteger(value) || value < 1) {
         throw bad('number must be a positive integer');
       }
     } else {
       value = ML.has(key)
-        ? String(value ?? '')
-            .replace(/\r\n?/g, '\n')
-            .trimEnd()
-            .slice(0, 50000)
-        : String(value ?? '')
-            .trim()
-            .slice(0, 50000);
+        ? String(value ?? '').replace(/\r\n?/g, '\n').trimEnd().slice(0, 50000)
+        : String(value ?? '').trim().slice(0, 50000);
 
       if (
         value &&
@@ -312,11 +271,9 @@ async function one(Model, id) {
   }
 
   const document = await Model.findById(id);
-
   if (!document) {
     throw Object.assign(new Error('Not found'), { status: 404 });
   }
-
   return document;
 }
 
@@ -324,13 +281,10 @@ async function one(Model, id) {
 
 const app = express();
 
-if (PROD) {
-  app.set('trust proxy', 1);
-}
+if (PROD) app.set('trust proxy', 1);
 
 app.use(
   helmet({
-    // YouTube embeds fail with Error 153 when no Referer is sent (helmet default is no-referrer)
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     contentSecurityPolicy: {
       directives: {
@@ -354,7 +308,6 @@ app.use((req, res, next) => {
 
   if (req.method !== 'GET' && origin) {
     let originHost;
-
     try {
       originHost = new URL(origin).host;
     } catch {
@@ -385,29 +338,20 @@ app.use(
   })
 );
 
-app.use(
-  '/uploads',
-  express.static(UP, { index: false, dotfiles: 'deny' })
-);
+app.use('/uploads', express.static(UP, { index: false, dotfiles: 'deny' }));
 
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, 'index.html'))
-);
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/app.js', (req, res) => res.sendFile(path.join(__dirname, 'app.js')));
+app.get('/styles.css', (req, res) => res.sendFile(path.join(__dirname, 'styles.css')));
 
-app.get('/index.html', (req, res) =>
-  res.sendFile(path.join(__dirname, 'index.html'))
-);
-
-app.get('/app.js', (req, res) =>
-  res.sendFile(path.join(__dirname, 'app.js'))
-);
-
-app.get('/styles.css', (req, res) =>
-  res.sendFile(path.join(__dirname, 'styles.css'))
-);
-
+// Cloudinary configuration
 const CLOUD = Boolean(process.env.CLOUDINARY_URL);
 const cloudinary = CLOUD ? require('cloudinary').v2 : null;
+
+if (CLOUD) {
+  cloudinary.config({ secure: true });
+}
 
 app.get('/health', (req, res) =>
   res.json({
@@ -425,7 +369,6 @@ app.get('/health', (req, res) =>
 // -------------------- API AND AUTHENTICATION --------------------
 
 const api = express.Router();
-
 app.use('/api', api);
 
 api.use(
@@ -433,21 +376,17 @@ api.use(
     if (req.session.uid) {
       req.user = await User.findById(req.session.uid);
     }
-
     next();
   })
 );
 
 const requireAuth = (req, res, next) =>
-  req.user
-    ? next()
-    : res.status(401).json({ error: 'Authentication required' });
+  req.user ? next() : res.status(401).json({ error: 'Authentication required' });
 
 const requireAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-
   return req.user.role === 'admin'
     ? next()
     : res.status(403).json({ error: 'Administrator access required' });
@@ -470,9 +409,7 @@ api.post(
     }
 
     if (attempt.c >= 10) {
-      return res
-        .status(429)
-        .json({ error: 'Too many attempts. Try again later.' });
+      return res.status(429).json({ error: 'Too many attempts. Try again later.' });
     }
 
     const user = await User.findOne({
@@ -487,16 +424,11 @@ api.post(
     if (!user || !valid) {
       attempt.c++;
       tries.set(key, attempt);
-
-      return res.status(401).json({
-        error: 'Invalid email or password'
-      });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     await new Promise((resolve, reject) => {
-      req.session.regenerate(error =>
-        error ? reject(error) : resolve()
-      );
+      req.session.regenerate(error => error ? reject(error) : resolve());
     });
 
     req.session.uid = String(user._id);
@@ -540,12 +472,7 @@ api.get(
   '/profile',
   wrap(async (req, res) => {
     const user = await User.findOne({ role: 'admin' }).sort('createdAt');
-
-    res.json(
-      user
-        ? Object.fromEntries(PUB.map(key => [key, user[key]]))
-        : {}
-    );
+    res.json(user ? Object.fromEntries(PUB.map(key => [key, user[key]])) : {});
   })
 );
 
@@ -573,42 +500,25 @@ const MIME = {
 };
 
 const upload = multer({
-  limits: {
-    fileSize: 100 * 1024 * 1024,
-    files: 1
-  },
+  limits: { fileSize: 100 * 1024 * 1024, files: 1 },
   storage: multer.diskStorage({
     destination: UP,
     filename: (req, file, callback) =>
-      callback(
-        null,
-        crypto.randomUUID() +
-          path.extname(file.originalname).toLowerCase()
-      )
+      callback(null, crypto.randomUUID() + path.extname(file.originalname).toLowerCase())
   }),
   fileFilter: (req, file, callback) => {
     const extension = path.extname(file.originalname).toLowerCase();
-
     if (MIME[extension] !== file.mimetype) {
-      return callback(
-        bad('Unsupported file type. Allowed: png, jpg, webp, gif, pdf, mp4, webm')
-      );
+      return callback(bad('Unsupported file type. Allowed: png, jpg, webp, gif, pdf, mp4, webm'));
     }
-
     callback(null, true);
   }
 });
 
 const SIG = {
-  'image/png': buffer =>
-    buffer.slice(0, 4).toString('hex') === '89504e47',
-
-  'image/jpeg': buffer =>
-    buffer.slice(0, 3).toString('hex') === 'ffd8ff',
-
-  'image/gif': buffer =>
-    /^GIF8[79]a$/.test(buffer.slice(0, 6).toString('latin1')),
-
+  'image/png': buffer => buffer.slice(0, 4).toString('hex') === '89504e47',
+  'image/jpeg': buffer => buffer.slice(0, 3).toString('hex') === 'ffd8ff',
+  'image/gif': buffer => /^GIF8[79]a$/.test(buffer.slice(0, 6).toString('latin1')),
   'image/webp': buffer =>
     buffer.slice(0, 4).toString('latin1') === 'RIFF' &&
     buffer.slice(8, 12).toString('latin1') === 'WEBP'
@@ -616,9 +526,7 @@ const SIG = {
 
 function imgOk(file) {
   if (!SIG[file.mimetype]) return true;
-
   let fd;
-
   try {
     fd = fs.openSync(file.path, 'r');
     const buffer = Buffer.alloc(12);
@@ -631,7 +539,9 @@ function imgOk(file) {
   }
 }
 
-function sendUpload(req, res, next) {
+// Continue with Part 2 immediately after this line.
+
+async function sendUpload(req, res, next) {
   const file = req.file;
 
   if (!file) {
@@ -641,11 +551,10 @@ function sendUpload(req, res, next) {
   if (!CLOUD) {
     if (PROD && !process.env.UPLOAD_DIR) {
       fs.unlink(file.path, () => {});
-
       return next(
         Object.assign(
           new Error(
-            'Permanent uploads are not configured. Set CLOUDINARY_URL or attach a persistent disk and set UPLOAD_DIR.'
+            'Permanent uploads are not configured. Set CLOUDINARY_URL or configure a persistent UPLOAD_DIR.'
           ),
           { status: 503 }
         )
@@ -658,6 +567,7 @@ function sendUpload(req, res, next) {
   }
 
   const video = file.mimetype.startsWith('video/');
+  const pdf = file.mimetype === 'application/pdf';
 
   if (!video && file.size > 10 * 1024 * 1024) {
     fs.unlink(file.path, () => {});
@@ -666,46 +576,54 @@ function sendUpload(req, res, next) {
 
   const options = {
     folder: 'dsdl',
-    resource_type: video ? 'video' : 'image',
+    resource_type: video ? 'video' : pdf ? 'raw' : 'image',
     use_filename: false,
     unique_filename: true,
     overwrite: false
   };
 
-  const done = (error, result) => {
-    fs.unlink(file.path, () => {});
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const callback = (error, uploaded) => {
+        if (error) return reject(error);
+        resolve(uploaded);
+      };
 
-    if (
-      error ||
-      !result ||
-      !/^https:\/\//.test(result.secure_url || '')
-    ) {
-      console.error(
-        'Cloudinary upload failed:',
-        error && error.message
-      );
+      if (video) {
+        cloudinary.uploader.upload_large(
+          file.path,
+          { ...options, chunk_size: 6000000 },
+          callback
+        );
+      } else {
+        cloudinary.uploader.upload(file.path, options, callback);
+      }
+    });
 
-      return next(
-        Object.assign(
-          new Error('The file could not be saved to cloud storage. Please try again.'),
-          { status: 502 }
-        )
-      );
+    if (!result || !result.secure_url) {
+      throw new Error('Cloudinary did not return a secure URL');
     }
 
-    return res.status(201).json({
-      url: result.secure_url
+    console.log('Cloudinary upload successful:', {
+      resourceType: options.resource_type,
+      bytes: file.size
     });
-  };
 
-  if (video) {
-    cloudinary.uploader.upload_large(
-      file.path,
-      { ...options, chunk_size: 6e6 },
-      done
+    return res.status(201).json({ url: result.secure_url });
+  } catch (error) {
+    console.error('Cloudinary upload failed:', {
+      message: error.message,
+      httpCode: error.http_code
+    });
+
+    return next(
+      Object.assign(
+        new Error('Cloudinary upload failed. Check Render logs for details.'),
+        { status: 502 }
+      )
     );
-  } else {
-    cloudinary.uploader.upload(file.path, options, done);
+  } finally {
+    fs.unlink(file.path, () => {});
   }
 }
 
@@ -715,7 +633,6 @@ api.post('/upload', requireAdmin, (req, res, next) => {
       if (error.code === 'LIMIT_FILE_SIZE') {
         return next(bad('File too large (max 100 MB)'));
       }
-
       return next(error);
     }
 
@@ -733,9 +650,7 @@ api.post('/upload', requireAdmin, (req, res, next) => {
 
     if (!imgOk(req.file)) {
       fs.unlink(req.file.path, () => {});
-      return next(
-        bad('File content does not match an image of that type')
-      );
+      return next(bad('File content does not match an image of that type'));
     }
 
     sendUpload(req, res, next);
@@ -748,282 +663,181 @@ require('./exec').mount(api, { wrap, requireAdmin });
 
 // -------------------- SUBJECTS AND MODULES --------------------
 
-api.get(
-  '/subjects',
-  wrap(async (req, res) => {
-    const subjects = await Subject.find().sort('-updatedAt').lean();
+api.get('/subjects', wrap(async (req, res) => {
+  const subjects = await Subject.find().sort('-updatedAt').lean();
 
-    const counts = await Module.aggregate([
-      { $match: { name: { $ne: '' } } },
-      { $group: { _id: '$subject', n: { $sum: 1 } } }
-    ]);
+  const counts = await Module.aggregate([
+    { $match: { name: { $ne: '' } } },
+    { $group: { _id: '$subject', n: { $sum: 1 } } }
+  ]);
 
-    const moduleCounts = Object.fromEntries(
-      counts.map(item => [item._id, item.n])
-    );
+  const moduleCounts = Object.fromEntries(
+    counts.map(item => [item._id, item.n])
+  );
 
-    res.json(
-      subjects.map(subject => ({
-        ...subject,
-        moduleCount: moduleCounts[subject._id] || 0
-      }))
-    );
-  })
-);
+  res.json(subjects.map(subject => ({
+    ...subject,
+    moduleCount: moduleCounts[subject._id] || 0
+  })));
+}));
 
-api.get(
-  '/subjects/:id/modules',
-  wrap(async (req, res) => {
-    await one(Subject, req.params.id);
+api.get('/subjects/:id/modules', wrap(async (req, res) => {
+  await one(Subject, req.params.id);
+  res.json(await Module.find({ subject: req.params.id }).sort('number'));
+}));
 
-    res.json(
-      await Module.find({ subject: req.params.id }).sort('number')
-    );
-  })
-);
+api.get('/modules/:id', wrap(async (req, res) => {
+  const module = await one(Module, req.params.id);
+  res.json({
+    ...module.toObject(),
+    subjectDoc: await Subject.findById(module.subject).select('name')
+  });
+}));
 
-api.get(
-  '/modules/:id',
-  wrap(async (req, res) => {
-    const module = await one(Module, req.params.id);
+api.put('/modules/:id', requireAdmin, wrap(async (req, res) => {
+  const module = await one(Module, req.params.id);
 
-    res.json({
-      ...module.toObject(),
-      subjectDoc: await Subject.findById(module.subject).select('name')
-    });
-  })
-);
+  Object.assign(module, clean(req.body, [
+    'name', 'description', 'pdf', 'videoUrl', 'topics', 'notes'
+  ]));
 
-api.put(
-  '/modules/:id',
-  requireAdmin,
-  wrap(async (req, res) => {
-    const module = await one(Module, req.params.id);
-
-    Object.assign(
-      module,
-      clean(req.body, [
-        'name',
-        'description',
-        'pdf',
-        'videoUrl',
-        'topics',
-        'notes'
-      ])
-    );
-
-    await module.save();
-    res.json(module);
-  })
-);
+  await module.save();
+  res.json(module);
+}));
 
 // -------------------- EXPERIMENTS --------------------
 
-api.get(
-  '/experiments',
-  wrap(async (req, res) => {
-    const experiments = await Experiment.find().sort('number').lean();
-    const subs = await Sub.find().sort('order label').lean();
+api.get('/experiments', wrap(async (req, res) => {
+  const experiments = await Experiment.find().sort('number').lean();
+  const subs = await Sub.find().sort('order label').lean();
 
-    res.json(
-      experiments.map(experiment => ({
-        ...experiment,
-        subs: subs
-          .filter(sub => String(sub.experiment) === String(experiment._id))
-          .map(sub => ({
-            _id: sub._id,
-            label: sub.label
-          }))
-      }))
-    );
-  })
-);
+  res.json(experiments.map(experiment => ({
+    ...experiment,
+    subs: subs
+      .filter(sub => String(sub.experiment) === String(experiment._id))
+      .map(sub => ({ _id: sub._id, label: sub.label }))
+  })));
+}));
 
-api.get(
-  '/experiments/by-number/:n',
-  wrap(async (req, res) => {
-    const experiment = await Experiment.findOne({
-      number: Number(req.params.n)
-    });
+api.get('/experiments/by-number/:n', wrap(async (req, res) => {
+  const experiment = await Experiment.findOne({
+    number: Number(req.params.n)
+  });
 
-    if (!experiment) {
-      throw Object.assign(new Error('Not found'), { status: 404 });
+  if (!experiment) {
+    throw Object.assign(new Error('Not found'), { status: 404 });
+  }
+
+  res.json({
+    ...experiment.toObject(),
+    subs: await Sub.find({ experiment: experiment._id }).sort('order label')
+  });
+}));
+
+api.post('/experiments/:id/subs', requireAdmin, wrap(async (req, res) => {
+  const experiment = await one(Experiment, req.params.id);
+  const used = (await Sub.find({ experiment: experiment._id }))
+    .map(sub => sub.label);
+
+  const label = [...Array(26).keys()]
+    .map(index => experiment.number + String.fromCharCode(65 + index))
+    .find(value => !used.includes(value));
+
+  if (!label) throw bad('Maximum of 26 sub-experiments reached');
+
+  const data = clean(req.body, SUBF);
+  if (!data.name) throw bad('name is required');
+
+  res.status(201).json(await Sub.create({
+    ...data,
+    experiment: experiment._id,
+    label,
+    order: used.length
+  }));
+}));
+
+api.put('/experiments/:id/subs/reorder', requireAdmin, wrap(async (req, res) => {
+  const experiment = await one(Experiment, req.params.id);
+  const ids = Array.isArray(req.body.ids) ? req.body.ids.map(String) : [];
+  const subs = await Sub.find({ experiment: experiment._id });
+
+  if (
+    new Set(ids).size !== ids.length ||
+    ids.length !== subs.length ||
+    !subs.every(sub => ids.includes(String(sub._id)))
+  ) {
+    throw bad('ids must list every sub-experiment exactly once');
+  }
+
+  await Sub.bulkWrite(ids.map((id, index) => ({
+    updateOne: {
+      filter: { _id: id, experiment: experiment._id },
+      update: { $set: { order: index } }
     }
+  })));
 
-    res.json({
-      ...experiment.toObject(),
-      subs: await Sub.find({ experiment: experiment._id }).sort('order label')
-    });
-  })
-);
+  res.json({ ok: true });
+}));
 
-api.post(
-  '/experiments/:id/subs',
-  requireAdmin,
-  wrap(async (req, res) => {
-    const experiment = await one(Experiment, req.params.id);
+api.get('/subs/:id', wrap(async (req, res) => {
+  res.json(await one(Sub, req.params.id));
+}));
 
-    const used = (
-      await Sub.find({ experiment: experiment._id })
-    ).map(sub => sub.label);
+api.put('/subs/:id', requireAdmin, wrap(async (req, res) => {
+  const sub = await one(Sub, req.params.id);
+  Object.assign(sub, clean(req.body, SUBF));
+  await sub.save();
+  res.json(sub);
+}));
 
-    const label = [...Array(26).keys()]
-      .map(index => experiment.number + String.fromCharCode(65 + index))
-      .find(value => !used.includes(value));
-
-    if (!label) {
-      throw bad('Maximum of 26 sub-experiments reached');
-    }
-
-    const data = clean(req.body, SUBF);
-
-    if (!data.name) {
-      throw bad('name is required');
-    }
-
-    res.status(201).json(
-      await Sub.create({
-        ...data,
-        experiment: experiment._id,
-        label,
-        order: used.length
-      })
-    );
-  })
-);
-
-api.put(
-  '/experiments/:id/subs/reorder',
-  requireAdmin,
-  wrap(async (req, res) => {
-    const experiment = await one(Experiment, req.params.id);
-
-    const ids = Array.isArray(req.body.ids)
-      ? req.body.ids.map(String)
-      : [];
-
-    const subs = await Sub.find({ experiment: experiment._id });
-
-    if (
-      new Set(ids).size !== ids.length ||
-      ids.length !== subs.length ||
-      !subs.every(sub => ids.includes(String(sub._id)))
-    ) {
-      throw bad(
-        'ids must list every sub-experiment of this experiment exactly once'
-      );
-    }
-
-    await Sub.bulkWrite(
-      ids.map((id, index) => ({
-        updateOne: {
-          filter: { _id: id, experiment: experiment._id },
-          update: { $set: { order: index } }
-        }
-      }))
-    );
-
-    res.json({ ok: true });
-  })
-);
-
-api.get(
-  '/subs/:id',
-  wrap(async (req, res) => {
-    res.json(await one(Sub, req.params.id));
-  })
-);
-
-api.put(
-  '/subs/:id',
-  requireAdmin,
-  wrap(async (req, res) => {
-    const sub = await one(Sub, req.params.id);
-
-    Object.assign(sub, clean(req.body, SUBF));
-    await sub.save();
-
-    res.json(sub);
-  })
-);
-
-api.delete(
-  '/subs/:id',
-  requireAdmin,
-  wrap(async (req, res) => {
-    const sub = await one(Sub, req.params.id);
-
-    await sub.deleteOne();
-    rmFiles(sub.videoUrl, sub.fileUrl);
-
-    res.json({ ok: true });
-  })
-);
+api.delete('/subs/:id', requireAdmin, wrap(async (req, res) => {
+  const sub = await one(Sub, req.params.id);
+  await sub.deleteOne();
+  rmFiles(sub.videoUrl, sub.fileUrl);
+  res.json({ ok: true });
+}));
 
 // -------------------- GENERIC CRUD --------------------
 
 function crud(route, Model, allowed, required, after, del) {
-  api.get(
-    '/' + route,
-    wrap(async (req, res) => {
-      res.json(await Model.find().sort('-updatedAt'));
-    })
-  );
+  api.get('/' + route, wrap(async (req, res) => {
+    res.json(await Model.find().sort('-updatedAt'));
+  }));
 
-  api.get(
-    '/' + route + '/:id',
-    wrap(async (req, res) => {
-      res.json(await one(Model, req.params.id));
-    })
-  );
+  api.get('/' + route + '/:id', wrap(async (req, res) => {
+    res.json(await one(Model, req.params.id));
+  }));
 
-  api.post(
-    '/' + route,
-    requireAdmin,
-    wrap(async (req, res) => {
-      const data = clean(req.body, allowed);
+  api.post('/' + route, requireAdmin, wrap(async (req, res) => {
+    const data = clean(req.body, allowed);
 
-      for (const key of required) {
-        if (!data[key]) throw bad(key + ' is required');
-      }
+    for (const key of required) {
+      if (!data[key]) throw bad(key + ' is required');
+    }
 
-      const document = await Model.create(data);
+    const document = await Model.create(data);
+    if (after) await after(document);
+    res.status(201).json(document);
+  }));
 
-      if (after) await after(document);
+  api.put('/' + route + '/:id', requireAdmin, wrap(async (req, res) => {
+    const document = await one(Model, req.params.id);
+    Object.assign(document, clean(req.body, allowed));
 
-      res.status(201).json(document);
-    })
-  );
+    for (const key of required) {
+      if (!document[key]) throw bad(key + ' is required');
+    }
 
-  api.put(
-    '/' + route + '/:id',
-    requireAdmin,
-    wrap(async (req, res) => {
-      const document = await one(Model, req.params.id);
+    await document.save();
+    res.json(document);
+  }));
 
-      Object.assign(document, clean(req.body, allowed));
-
-      for (const key of required) {
-        if (!document[key]) throw bad(key + ' is required');
-      }
-
-      await document.save();
-      res.json(document);
-    })
-  );
-
-  api.delete(
-    '/' + route + '/:id',
-    requireAdmin,
-    wrap(async (req, res) => {
-      const document = await one(Model, req.params.id);
-
-      if (del) await del(document);
-
-      await document.deleteOne();
-      res.json({ ok: true });
-    })
-  );
+  api.delete('/' + route + '/:id', requireAdmin, wrap(async (req, res) => {
+    const document = await one(Model, req.params.id);
+    if (del) await del(document);
+    await document.deleteOne();
+    res.json({ ok: true });
+  }));
 }
 
 crud(
@@ -1031,16 +845,15 @@ crud(
   Subject,
   ['name', 'code', 'description', 'category', 'cover'],
   ['name'],
-  subject =>
-    Module.insertMany(
-      [1, 2, 3, 4, 5].map(number => ({
-        subject: subject._id,
-        number,
-        name: '',
-        description: '',
-        topics: []
-      }))
-    ),
+  subject => Module.insertMany(
+    [1, 2, 3, 4, 5].map(number => ({
+      subject: subject._id,
+      number,
+      name: '',
+      description: '',
+      topics: []
+    }))
+  ),
   subject => Module.deleteMany({ subject: subject._id })
 );
 
@@ -1052,7 +865,6 @@ crud(
   null,
   async experiment => {
     const subs = await Sub.find({ experiment: experiment._id });
-
     await Sub.deleteMany({ experiment: experiment._id });
 
     rmFiles(
@@ -1086,119 +898,76 @@ crud(
 
 // -------------------- STATISTICS AND SEARCH --------------------
 
-api.get(
-  '/stats',
-  wrap(async (req, res) => {
-    const counts = await Promise.all([
-      Subject,
-      Module,
-      Experiment,
-      Sub,
-      Project,
-      Resource,
-      Tool
-    ].map(model =>
-      model === Module
-        ? Module.countDocuments({ name: { $ne: '' } })
-        : model.countDocuments()
-    ));
+api.get('/stats', wrap(async (req, res) => {
+  const counts = await Promise.all([
+    Subject, Module, Experiment, Sub, Project, Resource, Tool
+  ].map(model =>
+    model === Module
+      ? Module.countDocuments({ name: { $ne: '' } })
+      : model.countDocuments()
+  ));
 
-    res.json(
-      Object.fromEntries(
-        [
-          'subjects',
-          'modules',
-          'experiments',
-          'subExperiments',
-          'projects',
-          'resources',
-          'tools'
-        ].map((key, index) => [key, counts[index]])
-      )
-    );
-  })
-);
+  res.json(Object.fromEntries([
+    'subjects', 'modules', 'experiments', 'subExperiments',
+    'projects', 'resources', 'tools'
+  ].map((key, index) => [key, counts[index]])));
+}));
 
-api.get(
-  '/search',
-  wrap(async (req, res) => {
-    const query = String(req.query.q || '').trim().slice(0, 100);
+api.get('/search', wrap(async (req, res) => {
+  const query = String(req.query.q || '').trim().slice(0, 100);
+  if (!query) return res.json([]);
 
-    if (!query) return res.json([]);
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(escaped, 'i');
+  const limit = 8;
+  const output = [];
 
-    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escaped, 'i');
-    const limit = 8;
-    const output = [];
+  const find = async (Model, fields, map) => {
+    const results = await Model.find({
+      $or: fields.map(field => ({ [field]: regex }))
+    }).limit(limit);
 
-    const find = async (Model, fields, map) => {
-      const results = await Model.find({
-        $or: fields.map(field => ({ [field]: regex }))
-      }).limit(limit);
+    results.forEach(item => output.push(map(item)));
+  };
 
-      results.forEach(item => output.push(map(item)));
-    };
+  await Promise.all([
+    find(Subject, ['name', 'description', 'code'], item => ({
+      type: 'Subject', title: item.name,
+      desc: item.description, link: '#/subjects/' + item._id
+    })),
+    find(Module, ['name', 'description', 'topics'], item => ({
+      type: 'Module', title: `Module ${item.number}: ${item.name}`,
+      desc: item.description, link: '#/modules/' + item._id
+    })),
+    find(Experiment, ['name', 'description'], item => ({
+      type: 'Experiment', title: `Experiment ${item.number}: ${item.name}`,
+      desc: item.description, link: '#/experiments/' + item.number
+    })),
+    find(Sub, ['name', 'description', 'code'], item => ({
+      type: 'Sub-experiment', title: `${item.label} ${item.name}`,
+      desc: item.description,
+      link: `#/experiments/${parseInt(item.label)}/sub-experiments/${item.label.toLowerCase()}`
+    })),
+    find(Project, ['name', 'description', 'category', 'tags'], item => ({
+      type: 'Project', title: item.name,
+      desc: item.description, link: '#/projects'
+    })),
+    find(Resource, ['name', 'description', 'category', 'tags'], item => ({
+      type: 'Resource', title: item.name,
+      desc: item.description, link: '#/resources'
+    })),
+    find(Tool, ['name', 'description', 'category', 'tags'], item => ({
+      type: 'Tool', title: item.name,
+      desc: item.description, link: '#/tools'
+    }))
+  ]);
 
-    await Promise.all([
-      find(Subject, ['name', 'description', 'code'], item => ({
-        type: 'Subject',
-        title: item.name,
-        desc: item.description,
-        link: '#/subjects/' + item._id
-      })),
-
-      find(Module, ['name', 'description', 'topics'], item => ({
-        type: 'Module',
-        title: `Module ${item.number}: ${item.name}`,
-        desc: item.description,
-        link: '#/modules/' + item._id
-      })),
-
-      find(Experiment, ['name', 'description'], item => ({
-        type: 'Experiment',
-        title: `Experiment ${item.number}: ${item.name}`,
-        desc: item.description,
-        link: '#/experiments/' + item.number
-      })),
-
-      find(Sub, ['name', 'description', 'code'], item => ({
-        type: 'Sub-experiment',
-        title: `${item.label} ${item.name}`,
-        desc: item.description,
-        link: `#/experiments/${parseInt(item.label)}/sub-experiments/${item.label.toLowerCase()}`
-      })),
-
-      find(Project, ['name', 'description', 'category', 'tags'], item => ({
-        type: 'Project',
-        title: item.name,
-        desc: item.description,
-        link: '#/projects'
-      })),
-
-      find(Resource, ['name', 'description', 'category', 'tags'], item => ({
-        type: 'Resource',
-        title: item.name,
-        desc: item.description,
-        link: '#/resources'
-      })),
-
-      find(Tool, ['name', 'description', 'category', 'tags'], item => ({
-        type: 'Tool',
-        title: item.name,
-        desc: item.description,
-        link: '#/tools'
-      }))
-    ]);
-
-    res.json(output);
-  })
-);
+  res.json(output);
+}));
 
 // -------------------- ERROR HANDLING --------------------
 
-api.use((req, res) =>
-  res.status(404).json({ error: 'Not found' })
-);
+api.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
 app.use((error, req, res, next) => {
   const status =
@@ -1234,7 +1003,6 @@ app.use((error, req, res, next) => {
         passwordHash: await bcrypt.hash(ADMIN_PASSWORD, 12),
         role: 'admin'
       });
-
       console.log('First administrator created.');
     } else {
       console.warn(
@@ -1243,8 +1011,8 @@ app.use((error, req, res, next) => {
     }
   }
 
-  app.listen(PORT, () => {
-    console.log('Listening on ' + PORT);
+  app.listen(process.env.PORT || PORT, () => {
+    console.log('Listening on ' + (process.env.PORT || PORT));
 
     if (PROD && !CLOUD && !process.env.UPLOAD_DIR) {
       console.warn(
