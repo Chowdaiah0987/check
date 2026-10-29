@@ -415,6 +415,7 @@ video.vid,iframe.vid{max-width:100%}
  .grid{grid-template-columns:1fr}
 }
 @media print{header,#side,.ctop,.pdfbar,#toast{display:none!important}}
+<<<<<<< HEAD
 
 /* mobile PDF.js viewer */
 .pdfpages{background:#e9ebf3;padding:8px;max-height:75vh;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
@@ -423,3 +424,5 @@ video.vid,iframe.vid{max-width:100%}
 .pdfpages:not(.zoomed) .pdfslot{width:100%}
 .pdfmsg{margin:20px auto;padding:0 12px;text-align:center;color:var(--mut)}
 .pdfpg{font-size:13px;color:var(--mut);margin-right:4px}
+=======
+>>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836
