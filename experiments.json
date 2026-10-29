@@ -1,0 +1,86 @@
+[
+  {
+    "_id": {
+      "$oid": "6ad2e794a0310bd647b644fc"
+    },
+    "number": {
+      "$numberInt": "1"
+    },
+    "name": "Data Visulization using Pandas",
+    "description": "Writes structured data into CSV files using pandas, demonstrating efficient tabular data storage and retrieval.",
+    "cover": "",
+    "videoUrl": "",
+    "github": "",
+    "notes": "",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792206740228"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792499559073"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    },
+    "objective": ""
+  },
+  {
+    "_id": {
+      "$oid": "6ad6488b678937b509afdf0e"
+    },
+    "number": {
+      "$numberInt": "2"
+    },
+    "name": "njfjh",
+    "description": "jkjhgfz",
+    "objective": "",
+    "cover": "",
+    "videoUrl": "",
+    "github": "",
+    "notes": "",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792428171115"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792428171115"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ad70011e70c19a6e107c1ba"
+    },
+    "number": {
+      "$numberInt": "3"
+    },
+    "name": "asasds",
+    "description": "ssfbhh;lkjhgfds",
+    "objective": "",
+    "cover": "",
+    "videoUrl": "",
+    "github": "",
+    "notes": "",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792475153759"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792475153759"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  }
+]
