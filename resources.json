@@ -1,0 +1,28 @@
+[
+  {
+    "_id": {
+      "$oid": "6ad2e7daa0310bd647b64525"
+    },
+    "name": "xnco aysq  ey8ih x",
+    "description": "dvhjbd ije",
+    "category": "i heiu",
+    "url": "",
+    "videoUrl": "",
+    "doc": "",
+    "tags": [],
+    "relatedSubject": "",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792206810706"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792206810706"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  }
+]

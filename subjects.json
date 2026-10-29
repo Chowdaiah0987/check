@@ -1,0 +1,25 @@
+[
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "name": "Data Science",
+    "code": "22DS102006",
+    "description": "Data Science (DS): Study and practice of collecting, storing, processing, and analyzing data to extract meaningful insights and support decision-making. It includes scientific methods, computational thinking, and systematic analysis of data. DS combines computer science, statistics, mathematics, and domain expertise",
+    "category": "Computer Science / IT",
+    "cover": "",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767314"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792498622417"
+      }
+    },
+    "__v": {
+      "$numberInt": "0"
+    }
+  }
+]

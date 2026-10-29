@@ -1,0 +1,158 @@
+[
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd4"
+    },
+    "subject": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "number": {
+      "$numberInt": "1"
+    },
+    "name": "introduction",
+    "description": "Data Science (DS): Study and practice of collecting, storing, processing, and analyzing data to\nextract meaningful insights and support decision-making. It includes scientific methods,\ncomputational thinking, and systematic analysis of data. DS combines computer science,\nstatistics, mathematics, and domain expertise",
+    "topics": [
+      ">what is Data Science",
+      ">Introduction to Data Science"
+    ],
+    "__v": {
+      "$numberInt": "1"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767407"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792499204348"
+      }
+    },
+    "notes": "",
+    "pdf": "",
+    "videoUrl": "https://www.youtube.com/watch?v=RBSUwFGa6Fk"
+  },
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd5"
+    },
+    "subject": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "number": {
+      "$numberInt": "2"
+    },
+    "name": "DATA EXTRACTION",
+    "description": "Companies extract meaning from the data from two people with very different approaches\nnamely, William Cukierski from Kaggle and David Huffaker from Google.",
+    "topics": [
+      "Reading CSV and Excel files using Pandas. Extracting data from websites using BeautifulSoup. Fetchin"
+    ],
+    "__v": {
+      "$numberInt": "2"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767407"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792499447392"
+      }
+    },
+    "notes": "",
+    "pdf": "",
+    "videoUrl": "https://www.youtube.com/watch?v=kEItYHtqQUg"
+  },
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd6"
+    },
+    "subject": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "number": {
+      "$numberInt": "3"
+    },
+    "name": "Plotting and Visualization",
+    "description": "Developing clear and insightful visualizations—often referred to as plots—is a key element of data analysis. Visuals serve different purposes: they can be used in the early stages of exploration to detect anomalies or assess the need for data transformation, or they may act as the final product, such as interactive dashboards for web-based applications.",
+    "topics": [
+      "•  Bar / Column Charts",
+      "• Line Charts",
+      "• Scatter Plots",
+      "• Histograms & Density Plots",
+      "• Box and Whisker Plots",
+      "• Heatmaps"
+    ],
+    "__v": {
+      "$numberInt": "1"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767408"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792499346242"
+      }
+    },
+    "notes": "",
+    "pdf": "",
+    "videoUrl": "https://www.youtube.com/watch?v=-jTD74eEy2I&t=169s"
+  },
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd7"
+    },
+    "subject": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "number": {
+      "$numberInt": "4"
+    },
+    "name": "",
+    "description": "",
+    "topics": [],
+    "__v": {
+      "$numberInt": "0"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767408"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792164767408"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ad2439f7923320c71c03dd8"
+    },
+    "subject": {
+      "$oid": "6ad2439f7923320c71c03dd2"
+    },
+    "number": {
+      "$numberInt": "5"
+    },
+    "name": "",
+    "description": "",
+    "topics": [],
+    "__v": {
+      "$numberInt": "0"
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1792164767408"
+      }
+    },
+    "updatedAt": {
+      "$date": {
+        "$numberLong": "1792164767408"
+      }
+    }
+  }
+]
