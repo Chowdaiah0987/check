@@ -8,11 +8,7 @@ document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.remov
 const F=(k,l,t,r)=>({k,l,t,r}),D=F('description','Short description','textarea'),LG=['python','java','c','cpp','javascript','r','sql','other'];
 const lk=(l,u)=>u?`<a class="btn ghost sm" href="${safe(u)}" target="_blank" rel="noopener noreferrer">${l}</a>`:'';
 const dl=u=>/^\/files\/[a-f0-9]{24}$/.test(u||'')?u+'?download=1':/^https:\/\/res\.cloudinary\.com\//i.test(u||'')?String(u).replace(/\/(image|raw|video)\/upload\//,'/$1/upload/fl_attachment/'):u;
-<<<<<<< HEAD
 const pdfView=(u,title)=>{if(!u)return'';const s=safe(u);return `<div class="pdfbox" data-pdf="${s}"><iframe class="pdf" src="${s}#toolbar=1&navpanes=0&view=FitH" title="${esc(title||'PDF document')}" loading="lazy"></iframe><div class="pdfbar"><a class="btn sm" href="${s}" target="_blank" rel="noopener noreferrer">Open PDF in new tab</a><a class="btn ghost sm" href="${safe(dl(u))}" download>Download</a><span class="meta">If the preview stays blank, use “Open PDF in new tab”.</span></div></div>`};
-=======
-const pdfView=(u,title)=>{if(!u)return'';const s=safe(u);return `<div class="pdfbox"><iframe class="pdf" src="${s}#toolbar=1&navpanes=0&view=FitH" title="${esc(title||'PDF document')}" loading="lazy"></iframe><div class="pdfbar"><a class="btn sm" href="${s}" target="_blank" rel="noopener noreferrer">Open PDF in new tab</a><a class="btn ghost sm" href="${safe(dl(u))}" download>Download</a><span class="meta">If the preview stays blank, use “Open PDF in new tab”.</span></div></div>`};
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836
 const ENT={
 subjects:{t:'Subjects',n:'Subject',f:[F('name','Name','text',1),F('code','Subject code'),F('category','Category'),D,F('cover','Cover image (png/jpg/webp)','file')],
  card:x=>({t:x.name,s:x.description,m:[x.code,x.category],img:x.cover,href:'#/subjects/'+x._id})},
@@ -225,7 +221,6 @@ async function side(h){let kind=/^\/(subjects|modules)/.test(h)?'m':/^\/experime
  $('#sn').innerHTML=html}catch{$('#sn').innerHTML=none('Could not load navigation.')}}
 window.onhashchange=route;
 $('#sf').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q)location.hash='#/search/'+encodeURIComponent(q)};init();
-<<<<<<< HEAD
 
 /* ---- Mobile PDF viewer (PDF.js, self-hosted). Phones cannot show PDFs inside an iframe. ---- */
 (()=>{
@@ -266,5 +261,3 @@ $('#sf').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q)locat
  const scan=()=>document.querySelectorAll('.pdfbox[data-pdf]:not([data-init])').forEach(init);
  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});scan();
 })();
-=======
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836

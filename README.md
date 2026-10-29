@@ -51,9 +51,6 @@ PDFs failed to preview because the security header (`Content-Security-Policy: ob
   It reads `uploads/*.pdf` and any Cloudinary `.pdf` links, skips duplicates, never deletes the originals, and lists any PDF it could not find so you can re-upload it.
 - `/health` now also reports `"pdfStorage": "mongodb"`.
 - Atlas free tier has 512 MB total; check your PDFs fit.
-<<<<<<< HEAD
 
 ## Mobile PDF viewing
 Phones cannot show a PDF inside an iframe (Chrome shows "This content is blocked"). On phones/tablets the site now draws PDF pages itself with PDF.js, self-hosted from `/vendor/pdfjs` (package `pdfjs-dist`, installed by `npm install`). Desktop still uses the browser's built-in viewer. If the preview can't load, "Open PDF in new tab" and "Download" always work. Only PDFs stored in MongoDB (`/files/<id>`) or `uploads/` are drawn this way.
-=======
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836

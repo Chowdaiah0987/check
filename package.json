@@ -26,13 +26,7 @@
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
     "mongoose": "^8.5.0",
-<<<<<<< HEAD
     "multer": "^1.4.5-lts.1",
     "pdfjs-dist": "^4.10.38"
   }
 }
-=======
-    "multer": "^1.4.5-lts.1"
-  }
-}
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836

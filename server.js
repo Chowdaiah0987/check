@@ -315,10 +315,7 @@ app.use(
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         'img-src': ["'self'", 'data:', 'blob:', 'https:'],
         'media-src': ["'self'", 'https:'],
-<<<<<<< HEAD
         'worker-src': ["'self'", 'blob:'],
-=======
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836
         'frame-src': [
           "'self'",
           'https://www.youtube-nocookie.com',
@@ -391,7 +388,6 @@ app.use(
   })
 );
 
-<<<<<<< HEAD
 // PDF.js (self-hosted) - draws PDF pages on a canvas so PDFs work on phones,
 // where browsers cannot show a PDF inside an <iframe>.
 app.use(
@@ -406,8 +402,6 @@ app.use(
   })
 );
 
-=======
->>>>>>> b2873161d522dd96727cdbad94f38e7d98e21836
 // Serve a PDF stored in MongoDB. Public read (same as /uploads), inline display,
 // byte-range support so large PDFs open and scroll quickly.
 app.get('/files/:id', async (req, res, next) => {
